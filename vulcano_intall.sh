@@ -23,7 +23,7 @@ COIN_CLI='vulcano-cli'
 # Link to the github zip folder, should be our own Github link
 # The zip contents should have a bin folder and 3 files inside, the daemon "alqod", the cli "alqo-cli" and the wallet "alqo-qt"
 # This format is very important or the script won't extract the contents properly.
-COIN_TGZ='https://github.com/kashabro/masternode-scripts/blob/master/vulcano-2.0.0.0-linux64.zip'
+COIN_TGZ='https://github.com/kashabro/masternode-scripts/files/2439704/vulcano-2.0.0.0-linux64.zip'
 
 # This should be found in the chainparams.cpp file on Github and it's the value of nDefaultPort on the Main Net, not Test Net or others.
 COIN_PORT=62543
