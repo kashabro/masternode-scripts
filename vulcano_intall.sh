@@ -1,48 +1,34 @@
 #!/bin/bash
-
 # This script will automatically install a masternode coin given the correct settings below
 # Read the comments above each parameter to change it correctly
-
 # The name of the coin in lowercase
 COIN_NAME='vulcano'
-
 # The config file of the coin, can be found on the coin's official Github
 CONFIG_FILE='vulcano.conf'
-
 # The directory the coin's config is located. Usually the child folder is usually ".coinname" such as ".syscoin" or ".alqo"
 # However you should locate the config folder on the coin's Github to be sure as sometimes it differs such as in this case
 # The config folder is called ".syscoincore"
 CONFIGFOLDER='/root/.vulcanocore'
-
 # The coin daemon which starts up the blockchain. Usually "{coinname}d" such as "alqod" or "crownd"
 COIN_DAEMON='vulcanod'
-
 # The coin cli which allows us to query the masternode / blockchain. Usually "{coinname}-cli".
 COIN_CLI='vulcano-cli'
-
 # Link to the github zip folder, should be our own Github link
 # The zip contents should have a bin folder and 3 files inside, the daemon "alqod", the cli "alqo-cli" and the wallet "alqo-qt"
 # This format is very important or the script won't extract the contents properly.
-COIN_TGZ='https://github.com/kashabro/masternode-scripts/files/2439704/vulcano-2.0.0.0-linux64.zip'
-
+COIN_TGZ='https://github.com/kashabro/masternode-scripts/blob/master/vulcano-2.0.0.0-linux64.zip'
 # This should be found in the chainparams.cpp file on Github and it's the value of nDefaultPort on the Main Net, not Test Net or others.
 COIN_PORT=62543
-
 # This should be found in the chainparamsbase.cpp file on Github and it's the value of nRPCPort on the Main Net, not Test Net or others.
 RPC_PORT=62541
-
 # That's the end - don't change anything below.
-
 COIN_ZIP=$(echo $COIN_TGZ | awk -F'/' '{print $NF}')
-
 COIN_PATH='/usr/local/bin/'
 TMP_FOLDER=$(mktemp -d)
 NODEIP=$(curl -s4 api.ipify.org)
-
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 NC='\033[0m' 
-
 function download_node() {
     echo -e "Preparing to download $COIN_NAME"
     # Create temporary directory -d specifies directory
@@ -54,7 +40,6 @@ function download_node() {
     fi
     # Change this later to take latest release version.
     wget $COIN_TGZ -O $dir/$COIN_NAME.zip
-
     sudo unzip -d $dir/$COIN_NAME $dir/$COIN_NAME.zip
     cp -f $dir/$COIN_NAME/*/bin/* /usr/local/bin/
     cp -f $dir/$COIN_NAME/*/lib/* /usr/local/lib/
@@ -63,39 +48,31 @@ function download_node() {
     chmod -R +X /usr/local/lib/ 
     
 }
-
 function configure_systemd() {
   cat << EOF > /etc/systemd/system/$COIN_NAME.service
 [Unit]
 Description=$COIN_NAME service
 After=network.target
-
 [Service]
 User=root
 Group=root
-
 Type=forking
 #PIDFile=$CONFIGFOLDER/$COIN_NAME.pid
-
 ExecStart=$COIN_PATH$COIN_DAEMON -daemon -conf=$CONFIGFOLDER/$CONFIG_FILE -datadir=$CONFIGFOLDER
 ExecStop=-$COIN_PATH$COIN_CLI -conf=$CONFIGFOLDER/$CONFIG_FILE -datadir=$CONFIGFOLDER stop
-
 Restart=always
 PrivateTmp=true
 TimeoutStopSec=60s
 TimeoutStartSec=10s
 StartLimitInterval=120s
 StartLimitBurst=5
-
 [Install]
 WantedBy=multi-user.target
 EOF
-
   systemctl daemon-reload
   sleep 3
   systemctl start $COIN_NAME.service
   systemctl enable $COIN_NAME.service >/dev/null 2>&1
-
   if [[ -z "$(ps axo cmd:100 | egrep $COIN_DAEMON)" ]]; then
     echo -e "${RED}$COIN_NAME is not running${NC}, please investigate. You should start by running the following commands as root:"
     echo -e "${GREEN}systemctl start $COIN_NAME.service"
@@ -104,8 +81,6 @@ EOF
     exit 1
   fi
 }
-
-
 function create_config() {
   mkdir $CONFIGFOLDER >/dev/null 2>&1
   RPCUSER=$(tr -cd '[:alnum:]' < /dev/urandom | fold -w10 | head -n1)
@@ -120,7 +95,6 @@ daemon=1
 port=$COIN_PORT
 EOF
 }
-
 function create_key() {
   echo -e "Enter your ${RED}$COIN_NAME Masternode Private Key${NC}. Leave it blank to generate a new ${RED}Masternode Private Key${NC} for you:"
   read -e COINKEY
@@ -141,7 +115,6 @@ function create_key() {
   $COIN_PATH$COIN_CLI stop
 fi
 }
-
 function update_config() {
   sed -i 's/daemon=1/daemon=0/' $CONFIGFOLDER/$CONFIG_FILE
   cat << EOF >> $CONFIGFOLDER/$CONFIG_FILE
@@ -153,8 +126,6 @@ externalip=$NODEIP:$COIN_PORT
 masternodeprivkey=$COINKEY
 EOF
 }
-
-
 function enable_firewall() {
   echo -e "Installing and setting up firewall to allow ingress on port ${GREEN}$COIN_PORT${NC}"
   ufw allow $COIN_PORT/tcp comment "$COIN_NAME MN port" >/dev/null
@@ -163,16 +134,12 @@ function enable_firewall() {
   ufw default allow outgoing >/dev/null 2>&1
   echo "y" | ufw enable >/dev/null 2>&1
 }
-
-
-
 function get_ip() {
   declare -a NODE_IPS
   for ips in $(netstat -i | awk '!/Kernel|Iface|lo/ {print $1," "}')
   do
     NODE_IPS+=($(curl --interface $ips --connect-timeout 2 -s4 api.ipify.org))
   done
-
   if [ ${#NODE_IPS[@]} -gt 1 ]
     then
       echo -e "${GREEN}More than one IP. Please type 0 to use the first IP, 1 for the second and so on...${NC}"
@@ -188,8 +155,6 @@ function get_ip() {
     NODEIP=${NODE_IPS[0]}
   fi
 }
-
-
 function compile_error() {
 if [ "$?" -gt "0" ];
  then
@@ -197,25 +162,20 @@ if [ "$?" -gt "0" ];
   exit 1
 fi
 }
-
-
 function checks() {
 if [[ $(lsb_release -d) != *16.04* ]]; then
   echo -e "${RED}You are not running Ubuntu 16.04. Installation is cancelled.${NC}"
   exit 1
 fi
-
 if [[ $EUID -ne 0 ]]; then
    echo -e "${RED}$0 must be run as root.${NC}"
    exit 1
 fi
-
 if [ -n "$(pidof $COIN_DAEMON)" ] || [ -e "$COIN_DAEMOM" ] ; then
   echo -e "${RED}$COIN_NAME is already installed.${NC}"
   exit 1
 fi
 }
-
 function prepare_system() {
 echo -e "Prepare the system to install ${GREEN}$COIN_NAME${NC} master node."
 apt-get update >/dev/null 2>&1
@@ -244,8 +204,6 @@ bsdmainutils libdb4.8++-dev libminiupnpc-dev libgmp3-dev ufw fail2ban pkg-config
  exit 1
 fi
 }
-
-
 function important_information() {
  echo
  echo -e "================================================================================================================================"
@@ -258,7 +216,6 @@ function important_information() {
  echo -e "Please check ${RED}$COIN_NAME${NC} is running with the following command: ${RED}systemctl status $COIN_NAME.service${NC}"
  echo -e "================================================================================================================================"
 }
-
 function setup_node() {
   get_ip
   create_config
@@ -268,11 +225,8 @@ function setup_node() {
   important_information
   configure_systemd
 }
-
-
 ##### Main #####
 clear
-
 checks
 prepare_system
 download_node
