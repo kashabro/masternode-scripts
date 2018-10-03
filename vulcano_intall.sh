@@ -207,7 +207,7 @@ COIN_DAEMON='vulcanod'
     sleep 30
     COINKEY=$($COIN_PATH$COIN_CLI masternode genkey)
   fi
-  $COIN_PATH$COIN_CLI stop
+  
 fi
 
 
