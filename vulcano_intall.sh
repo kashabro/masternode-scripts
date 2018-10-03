@@ -191,7 +191,6 @@ COIN_PATH='/usr/local/bin/'
 
 COIN_DAEMON='vulcanod'
 
-function create_key() {
   echo -e "Enter your ${RED}$COIN_NAME Masternode Private Key${NC}. Leave it blank to generate a new ${RED}Masternode Private Key${NC} for you:"
   read -e COINKEY
   if [[ -z "$COINKEY" ]]; then
@@ -210,7 +209,7 @@ function create_key() {
   fi
   $COIN_PATH$COIN_CLI stop
 fi
-}
+
 
 if [ -z "$FAIL2BAN" ]; then
   read -e -p "Install Fail2ban? [Y/n] : " FAIL2BAN
