@@ -23,13 +23,13 @@ COIN_CLI='aced-cli'
 # Link to the github zip folder, should be our own Github link
 # The zip contents should have a bin folder and 3 files inside, the daemon "alqod", the cli "alqo-cli" and the wallet "alqo-qt"
 # This format is very important or the script won't extract the contents properly.
-COIN_TGZ='https://github.com/kashabro/masternode-scripts/files/2448292/ge.zip'
+COIN_TGZ='https://github.com/kashabro/masternode-scripts/files/2448367/Aced.zip'
 
 # This should be found in the chainparams.cpp file on Github and it's the value of nDefaultPort on the Main Net, not Test Net or others.
-COIN_PORT=17017
+COIN_PORT=24126
 
 # This should be found in the chainparamsbase.cpp file on Github and it's the value of nRPCPort on the Main Net, not Test Net or others.
-RPC_PORT=9998
+RPC_PORT=24127
 
 # That's the end - don't change anything below.
 
