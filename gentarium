@@ -12,7 +12,7 @@ CONFIG_FILE='gentarium.conf'
 # The directory the coin's config is located. Usually the child folder is usually ".coinname" such as ".syscoin" or ".alqo"
 # However you should locate the config folder on the coin's Github to be sure as sometimes it differs such as in this case
 # The config folder is called ".syscoincore"
-CONFIGFOLDER='/root/.gentariumCore'
+CONFIGFOLDER='/root/.gentariumcore'
 
 # The coin daemon which starts up the blockchain. Usually "{coinname}d" such as "alqod" or "crownd"
 COIN_DAEMON='gentariumd'
